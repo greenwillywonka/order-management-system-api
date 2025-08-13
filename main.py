@@ -11,6 +11,7 @@ from db import get_session
 # from models.urls import Urls
 # from models.users import User, UserSchema, UserAccountSchema, UserRegistrationSchema
 # from models.tokens import Token, BlacklistedToken, create_access_token
+from models.orders import Orders  
 
 import config
 
@@ -39,9 +40,10 @@ async def root():
 
 @app.get("/orders")
 async def get_all_orders(session: Session = Depends(get_session)):
-    statement = select(orders)
+    statement = select(Orders)
     print(f"SQL Statement is: {statement}")
     results = session.exec(statement).all()
+    print(f"Results: {results}")
     return results
 
 # READ data

@@ -20,7 +20,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 app = FastAPI()
 
-origins = ["http://localhost:8000"]
+origins = ["http://localhost:5173"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,14 +37,14 @@ async def root():
     return {"message": "Hello World"}
 
 
-# @app.get("/urls")
-# async def get_all_urls(session: Session = Depends(get_session)):
-#     statement = select(Urls)
-#     print(f"SQL Statement is: {statement}")
-#     results = session.exec(statement).all()
-#     return results
+@app.get("/orders")
+async def get_all_urls(session: Session = Depends(get_session)):
+    statement = select(Orders)
+    print(f"SQL Statement is: {statement}")
+    results = session.exec(statement).all()
+    return results
 
-# # READ data
+# READ data
 
 
 # @app.get("/urls/{id}")
@@ -118,3 +118,6 @@ async def root():
 #             detail="Invalid token"
 #         )
 #     return {"details:": "Logged out"}
+
+if __name__ == "__main__":
+    uvicorn.run('main:app', host='localhost', port=8000, reload=True)

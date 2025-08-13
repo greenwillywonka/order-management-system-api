@@ -38,8 +38,8 @@ async def root():
 
 
 @app.get("/orders")
-async def get_all_urls(session: Session = Depends(get_session)):
-    statement = select(Orders)
+async def get_all_orders(session: Session = Depends(get_session)):
+    statement = select(orders)
     print(f"SQL Statement is: {statement}")
     results = session.exec(statement).all()
     return results

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, timezone
 from sqlmodel import Session, select
 from sqlalchemy.exc import IntegrityError
 from db import get_session
+from models.new_order import OrderCreate
 
 # from models.urls import Urls
 # from models.users import User, UserSchema, UserAccountSchema, UserRegistrationSchema
@@ -59,14 +60,15 @@ async def get_all_orders(session: Session = Depends(get_session)):
 # # CREATE data
 
 
-# @app.post("/orders/new")
-# async def add_url(payload: , session: Session = Depends(get_session)):
-#     new_order = Urls(title=payload.title, long_url=payload.long_url,
-#                    short_url=payload.short_url, user_id=payload.user_id)
-#     session.add(new_order)
-#     session.commit()
-#     session.refresh(new_order)
-#     return {"message": f"Added new url with ID: {new_order.id}"}
+@app.post("/orders")
+async def add_order(payload:OrderCreate, session: Session = Depends(get_session)):
+    print(f"Payload received: {payload}")
+    new_order = Orders(orderid=payload.orderid, customer=payload.customer, orderdate=payload.orderdate, po=payload.po, status=payload.status, total=payload.total
+    )
+    session.add(new_order)
+    session.commit()
+    session.refresh(new_order)
+    return {"message": f"Added new url with ID: {new_order.id}"}
 
 
 # @app.post('/register', response_model=UserSchema)

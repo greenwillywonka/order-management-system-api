@@ -63,7 +63,7 @@ async def get_all_orders(session: Session = Depends(get_session)):
 @app.post("/orders")
 async def add_order(payload:OrderCreate, session: Session = Depends(get_session)):
     print(f"Payload received: {payload}")
-    new_order = Orders(orderid=payload.orderid, customer=payload.customer, orderdate=payload.orderdate, po=payload.po, status=payload.status, total=payload.total
+    new_order = Orders( customer=payload.customer,po=payload.po, product=payload.product, quantity=payload.quantity, orderdate=datetime.now(), status=True, total=6.67
     )
     session.add(new_order)
     session.commit()

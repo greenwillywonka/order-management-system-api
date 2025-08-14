@@ -8,11 +8,17 @@ from datetime import date
 # from sqlalchemy.dialects.postgresql import DECIMAL as decimal
 
 class Orders(SQLModel, table=True):
-    __tablename__: str = "orders"
+    int = Field(
+        default=None,
+        primary_key=True,
+        index=True,
+        nullable=False,
+    )
+    # __tablename__: str = "orders"
 
-    orderid: str = Field(primary_key=True)
-    customer: str = Field(sa_column=Column(String))
-    orderdate: date = Field(sa_column=Column(Date))
-    po: str = Field(sa_column=Column(String))
-    status: str = Field(sa_column=Column(String))
-    total: float = Field(sa_column=Column(Float))
+    # orderid: str = Field(primary_key=True)
+    # customer: str = Field(sa_column=Column(String))
+    # orderdate: date = Field(sa_column=Column(Date))
+    # po: str = Field(sa_column=Column(String))
+    # status: str = Field(sa_column=Column(String))
+    # total: float = Field(sa_column=Column(Float))

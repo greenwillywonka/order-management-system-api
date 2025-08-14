@@ -1,10 +1,14 @@
 from pydantic import BaseModel
 from datetime import date
+from fastapi import FastAPI, Depends
+from sqlmodel import SQLModel, Field, Session, select
 
-class OrderCreate(BaseModel):
-    orderid: str
+class OrderCreate(SQLModel):
+    # orderid: str
     customer: str
-    orderdate: date
+    # orderdate: date
     po: str
-    status: str
+    product: str  # Assuming products is a list of product IDs or names
+    quantity: int
+    # status: str
     total: float

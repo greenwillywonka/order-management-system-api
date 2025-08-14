@@ -59,14 +59,14 @@ async def get_all_orders(session: Session = Depends(get_session)):
 # # CREATE data
 
 
-# @app.post("/urls/add")
-# async def add_url(payload: Urls, session: Session = Depends(get_session)):
-#     new_url = Urls(title=payload.title, long_url=payload.long_url,
+# @app.post("/orders/new")
+# async def add_url(payload: , session: Session = Depends(get_session)):
+#     new_order = Urls(title=payload.title, long_url=payload.long_url,
 #                    short_url=payload.short_url, user_id=payload.user_id)
-#     session.add(new_url)
+#     session.add(new_order)
 #     session.commit()
-#     session.refresh(new_url)
-#     return {"message": f"Added new url with ID: {new_url.id}"}
+#     session.refresh(new_order)
+#     return {"message": f"Added new url with ID: {new_order.id}"}
 
 
 # @app.post('/register', response_model=UserSchema)

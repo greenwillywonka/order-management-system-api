@@ -1,24 +1,19 @@
-# from .base import Base
-from sqlalchemy import String, Date, Float
-from sqlmodel import Field, Column
-from sqlmodel import SQLModel
+from pydantic import BaseModel
 from datetime import date
-# from sqlalchemy.dialects.postgresql import VARCHAR as varchar
-# from sqlalchemy.dialects.postgresql import NUMERIC as numeric
-# from sqlalchemy.dialects.postgresql import DECIMAL as decimal
+from fastapi import FastAPI, Depends
+from sqlmodel import SQLModel, Field, Session, select
+from .base import Base
 
-class Orders(SQLModel, table=True):
-    __tablename__: str = "orders"
 
-    orderid: int = Field(
-        default=None,
-        primary_key=True,
-        index=True,
-        nullable=False,
-    )
-    
-    customer: str = Field(sa_column=Column(String))
-    orderdate: date = Field(sa_column=Column(Date))
-    po: str = Field(sa_column=Column(String))
-    status: str = Field(sa_column=Column(String))
-    total: float = Field(sa_column=Column(Float))
+class Order(Base):
+    order_id: str
+    created_at: timestamp
+    order_customer: str
+    order_date: date
+    requested_date: str
+    order_po: str
+    order_product: str  
+    order_product_quantity: int
+    order_created_by: str
+    order_status: str
+    order_total: float

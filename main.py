@@ -12,7 +12,7 @@ from models.new_order import OrderCreate
 # from models.urls import Urls
 # from models.users import User, UserSchema, UserAccountSchema, UserRegistrationSchema
 # from models.tokens import Token, BlacklistedToken, create_access_token
-from models.orders import Orders  
+from models.orders import Order  
 
 import config
 
@@ -63,12 +63,12 @@ async def get_all_orders(session: Session = Depends(get_session)):
 @app.post("/orders")
 async def add_order(payload:OrderCreate, session: Session = Depends(get_session)):
     print(f"Payload received: {payload}")
-    new_order = Orders( customer=payload.customer,po=payload.po, product=payload.product, quantity=payload.quantity, orderdate=datetime.now(), status=True, total=6.67
+    new_order = Order( customer=payload.customer,po=payload.po, product=payload.product, quantity=payload.quantity, orderdate=datetime.now(), status=True, total=6.67
     )
-    session.add(new_order)
-    session.commit()
-    session.refresh(new_order)
-    print(f"New order: {new_order}")
+    # session.add(new_order)
+    # session.commit()
+    # session.refresh(new_order)
+    print(f"New order created: {new_order}")
     return True
 
 

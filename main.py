@@ -68,7 +68,8 @@ async def add_order(payload:OrderCreate, session: Session = Depends(get_session)
     session.add(new_order)
     session.commit()
     session.refresh(new_order)
-    return {"message": f"Added new url with ID: {new_order.id}"}
+    print(f"New order: {new_order}")
+    return True
 
 
 # @app.post('/register', response_model=UserSchema)

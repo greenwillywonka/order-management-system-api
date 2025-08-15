@@ -5,7 +5,6 @@ from sqlmodel import SQLModel, Field, Session, select
 from .base import Base #added this import to use Base class
 
 class OrderCreate(Base):    #changed from SQLModel to Base 
-    # orderid: str
     customer: str
     # orderdate: date
     po: str

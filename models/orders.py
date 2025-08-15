@@ -8,7 +8,6 @@ from sqlalchemy import String, Column, Date, DateTime, Float, Numeric #added thi
 
 class Order(Base):  #added fields to see if this would work. 
                     #they were not invluded in what i took from new order model
-    order_id: str               #= Field(sa_column=Column(String), primary_key=True, index=True)
     created_at: datetime                #= Field(sa_column=Column(DateTime))
     order_customer: str                 #= Field(sa_column=Column(String))
     order_date: date                #= Field(sa_column=Column(Date))

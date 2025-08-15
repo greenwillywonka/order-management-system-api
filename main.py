@@ -41,7 +41,7 @@ async def root():
 
 @app.get("/orders")
 async def get_all_orders(session: Session = Depends(get_session)):
-    statement = select(Orders)
+    statement = select(Order)
     print(f"SQL Statement is: {statement}")
     results = session.exec(statement).all()
     print(f"Results: {results}")
@@ -62,24 +62,22 @@ async def get_all_orders(session: Session = Depends(get_session)):
 
 @app.post("/orders")
 async def add_order(payload:Order, session: Session = Depends(get_session)):
-    print(f"Payload received: {payload}")
     new_order = Order( 
         order_customer=payload.order_customer,
         order_po=payload.order_po, 
         order_date=payload.order_date, 
         order_created_by=payload.order_created_by,
+        order_created_at=payload.order_created_at,
         requested_date=payload.requested_date, 
         order_product=payload.order_product, 
-        order_product_quantity=payload.order_product_quantity, 
-        order_date=payload.order_date, 
-        order_status=True,
+        order_product_quantity=payload.order_product_quantity,  
+        order_status="Pending",
         order_total=6.67
     )
-    # session.add(new_order)
-    # session.commit()
-    # session.refresh(new_order)
-    print(f"New order created: {new_order}")
-    return True
+    session.add(new_order)
+    session.commit()
+    session.refresh(new_order)
+    return {"message:" f"New order created: {new_order.id}"}
 
 
 # @app.post('/register', response_model=UserSchema)

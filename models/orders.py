@@ -6,9 +6,11 @@ from .base import Base
 from datetime import datetime
 from sqlalchemy import String, Column, Date, DateTime, Float, Numeric #added this to import sa_column types
 
-class Order(Base):  #added fields to see if this would work. 
-                    #they were not invluded in what i took from new order model
-    created_at: datetime                #= Field(sa_column=Column(DateTime))
+class Order(Base, table=True): 
+    __tablename__: str = 'orders'   #added fields to see if this would work. 
+
+                                    #they were not invluded in what i took from new order model
+    order_created_at: datetime                #= Field(sa_column=Column(DateTime))
     order_customer: str                 #= Field(sa_column=Column(String))
     order_date: date                #= Field(sa_column=Column(Date))
     requested_date: date                #= Field(sa_column=Column(Date))

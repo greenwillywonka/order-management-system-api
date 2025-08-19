@@ -22,6 +22,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 app = FastAPI()
 
+
+
 origins = ["http://localhost:5173"]
 
 app.add_middleware(
@@ -49,14 +51,6 @@ async def get_all_orders(session: Session = Depends(get_session)):
 
 # READ data
 
-
-# @app.get("/urls/{id}")
-# async def get_single_url(id: str, session: Session = Depends(get_session)):
-#     statement = select(Urls).where(Urls.id == id)
-#     result = session.exec(statement).one()
-
-#     return result
-
 # # CREATE data
 
 
@@ -67,17 +61,64 @@ async def add_order(payload:Order, session: Session = Depends(get_session)):
         order_po=payload.order_po, 
         order_date=payload.order_date, 
         order_created_by=payload.order_created_by,
-        order_created_at=payload.order_created_at,
+        order_created_at=datetime.now(timezone.utc),
         requested_date=payload.requested_date, 
         order_product=payload.order_product, 
         order_product_quantity=payload.order_product_quantity,  
-        order_status="Pending",
-        order_total=6.67
+        order_status=payload.order_status,
+        order_total=payload.order_total,
     )
     session.add(new_order)
     session.commit()
     session.refresh(new_order)
     return {"message:" f"New order created: {new_order.id}"}
+
+
+@app.get("/orders/{id}")
+async def get_order(id: int, session: Session = Depends(get_session)):
+    statement = select(Order).where(Order.id == id)
+    result = session.exec(statement).one()
+
+    return result
+
+@app.put("/orders/{id}")
+async def update_order(id: int, payload: Order, session: Session = Depends(get_session)):
+    updated_order = Order(
+        order_customer=payload.order_customer,
+        order_po=payload.order_po, 
+        order_date=payload.order_date, 
+        order_created_by=payload.order_created_by,
+        order_created_at=payload.order_created_at,
+        requested_date=payload.requested_date, 
+        order_product=payload.order_product, 
+        order_product_quantity=payload.order_product_quantity,  
+        order_status=payload.order_status,
+        order_total=payload.order_total,
+    )
+    statement = select(Order).where(Order.id == id)
+    existing_order = session.exec(statement).first()
+    
+    if not existing_order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Order with id {id} not found"
+        )
+    
+    existing_order.order_customer = updated_order.order_customer
+    existing_order.order_po = updated_order.order_po
+    existing_order.order_date = updated_order.order_date
+    existing_order.order_created_by = updated_order.order_created_by
+    existing_order.order_created_at = updated_order.order_created_at
+    existing_order.requested_date = updated_order.requested_date
+    existing_order.order_product = updated_order.order_product
+    existing_order.order_product_quantity = updated_order.order_product_quantity
+    existing_order.order_status = updated_order.order_status
+    existing_order.order_total = updated_order.order_total
+
+    session.add(existing_order)
+    session.commit()
+    session.refresh(existing_order)
+    return {"message:" f"Order updated: {existing_order.id}"}
 
 
 # @app.post('/register', response_model=UserSchema)

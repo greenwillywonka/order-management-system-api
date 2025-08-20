@@ -13,6 +13,7 @@ pydantic = {extras = ["email"], version = "*"}
 sqlmodel = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
+clerk-sdk-python = "*"
 
 [dev-packages]
 

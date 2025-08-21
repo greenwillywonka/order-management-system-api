@@ -82,6 +82,29 @@ async def add_order(payload:Order, session: Session = Depends(get_session)):
     session.refresh(new_order)
     return {"message:" f"New order created: {new_order.id}"}
 
+@app.post("/customers")
+async def add_customer(payload:Customer, session: Session = Depends(get_session)):
+    new_customer = Customer( 
+       created_at=payload.created_at,
+       order_quantity=payload.order_quantity,
+       last_order_date=payload.last_order_date,
+       average_order_total=payload.average_order_total,
+       assigned_representative=payload.assigned_representative,
+       customer_name=payload.customer_name,
+       customer_notes=payload.customer_notes,
+       purchaser=payload.purchaser,
+       email=payload.email,
+       phonenumber=payload.phonenumber,
+       address=payload.address,
+       city=payload.city,
+       state=payload.state,
+       zipcode=payload.zipcode,
+    )
+    session.add(new_customer)
+    session.commit()
+    session.refresh(new_customer)
+    return {"message:" f"New customer created: {new_customer.id}"}
+
 
 @app.get("/orders/{id}")
 async def get_order(id: int, session: Session = Depends(get_session)):

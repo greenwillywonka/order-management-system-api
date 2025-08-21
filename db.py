@@ -6,3 +6,7 @@ engine = create_engine(DATABASE_URL, echo=True)
 def get_session():
     with Session(engine) as session:
         yield session
+
+# For scripts (direct usage)
+def get_session_direct():
+    return Session(engine)

@@ -13,6 +13,7 @@ from models.new_order import OrderCreate
 # from models.users import User, UserSchema, UserAccountSchema, UserRegistrationSchema
 # from models.tokens import Token, BlacklistedToken, create_access_token
 from models.orders import Order  
+from models.customers import Customer
 
 import config
 
@@ -49,6 +50,14 @@ async def get_all_orders(session: Session = Depends(get_session)):
     print(f"Results: {results}")
     return results
 
+@app.get("/customers")
+async def get_all_customers(session: Session = Depends(get_session)):
+    statement = select(Customer)
+    print(f"SQL Statement is: {statement}")
+    results = session.exec(statement).all()
+    print(f"Results: {results}")
+    return results
+
 # READ data
 
 # # CREATE data
@@ -77,6 +86,13 @@ async def add_order(payload:Order, session: Session = Depends(get_session)):
 @app.get("/orders/{id}")
 async def get_order(id: int, session: Session = Depends(get_session)):
     statement = select(Order).where(Order.id == id)
+    result = session.exec(statement).one()
+
+    return result
+
+@app.get("/customers/{id}")
+async def get_customer(id: int, session: Session = Depends(get_session)):
+    statement = select(Customer).where(Customer.id == id)
     result = session.exec(statement).one()
 
     return result
@@ -119,6 +135,54 @@ async def update_order(id: int, payload: Order, session: Session = Depends(get_s
     session.commit()
     session.refresh(existing_order)
     return {"message:" f"Order updated: {existing_order.id}"}
+
+
+@app.put("/customers/{id}")
+async def update_customer(id: int, payload: Customer, session: Session = Depends(get_session)):
+    updated_customer = Customer(
+        created_at=payload.created_at,
+        order_quantity=payload.order_quantity,
+        last_order_date=payload.last_order_date,
+        average_order_total=payload.average_order_total,
+        assigned_representative=payload.assigned_representative,
+        customer_name=payload.customer_name,
+        customer_notes=payload.customer_notes,
+        purchaser=payload.purchaser,
+        email=payload.email,
+        phonenumber=payload.phonenumber,
+        address=payload.address,
+        city=payload.city,
+        state=payload.state,
+        zipcode=payload.zipcode,
+    )
+    statement = select(Customer).where(Customer.id == id)
+    existing_customer = session.exec(statement).first()
+    
+    if not existing_customer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Customer with id {id} not found"
+        )
+    
+    existing_customer.created_at = updated_customer.created_at
+    existing_customer.order_quantity = updated_customer.order_quantity
+    existing_customer.last_order_date = updated_customer.last_order_date
+    existing_customer.average_order_total = updated_customer.average_order_total
+    existing_customer.assigned_representative = updated_customer.assigned_representative
+    existing_customer.customer_name = updated_customer.customer_name
+    existing_customer.customer_notes = updated_customer.customer_notes
+    existing_customer.purchaser = updated_customer.purchaser
+    existing_customer.email = updated_customer.email
+    existing_customer.phonenumber = updated_customer.phonenumber
+    existing_customer.address = updated_customer.address
+    existing_customer.city = updated_customer.city
+    existing_customer.state = updated_customer.state
+    existing_customer.zipcode = updated_customer.zipcode
+
+    session.add(existing_customer)
+    session.commit()
+    session.refresh(existing_customer)
+    return {"message:" f"Customer updated: {existing_customer.id}"}
 
 
 # @app.post('/register', response_model=UserSchema)

@@ -1,0 +1,5 @@
+This project is a custom ERP-style order management system backend, created as my final project for the Build Carolina Academy web development boot camp. The idea came from my previous work experience, where I helped implement a new ERP system and saw the value of these tools. I wanted to build a personalized version to explore and practice managing orders and customers programmatically.
+
+The API supports creating, reading, updating, and managing orders and customer data. It also automatically tracks customer metrics like total orders, last order date, and average order total. All endpoints are documented with Swagger UI, making it easy to test and explore.
+
+The backend is built with FastAPI, uses Supabase (PostgreSQL) for storage, SQLModel/SQLAlchemy for ORM, and includes Python scripts for automated customer creation and data management. This setup provides a lightweight, flexible, and extendable foundation for ERP-style order management functionality.

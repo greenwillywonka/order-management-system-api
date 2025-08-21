@@ -20,3 +20,4 @@ class Order(Base, table=True):
     order_created_by: str               #= Field(sa_column=Column(String))
     order_status: str               #= Field(sa_column=Column(String))
     order_total: float              #= Field(sa_column=Column(Float))            #
+    tracking_number: str

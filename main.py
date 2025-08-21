@@ -76,6 +76,7 @@ async def add_order(payload:Order, session: Session = Depends(get_session)):
         order_product_quantity=payload.order_product_quantity,  
         order_status=payload.order_status,
         order_total=payload.order_total,
+        tracking_number=payload.tracking_number,
     )
     session.add(new_order)
     session.commit()
@@ -133,6 +134,7 @@ async def update_order(id: int, payload: Order, session: Session = Depends(get_s
         order_product_quantity=payload.order_product_quantity,  
         order_status=payload.order_status,
         order_total=payload.order_total,
+        tracking_number=payload.tracking_number,
     )
     statement = select(Order).where(Order.id == id)
     existing_order = session.exec(statement).first()
@@ -153,6 +155,7 @@ async def update_order(id: int, payload: Order, session: Session = Depends(get_s
     existing_order.order_product_quantity = updated_order.order_product_quantity
     existing_order.order_status = updated_order.order_status
     existing_order.order_total = updated_order.order_total
+    existing_order.tracking_number = updated_order.tracking_number
 
     session.add(existing_order)
     session.commit()

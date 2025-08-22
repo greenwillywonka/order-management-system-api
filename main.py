@@ -101,13 +101,7 @@ async def add_order(payload:Order, session: Session = Depends(get_session)):
         customer.last_order_date = new_order.order_date
 
         # Recalculate average order total
-        # orders_for_customer = session.exec(
-        #     select(Order).where(Order.order_customer == customer.customer_name)
-        # ).all()
-
-        # if orders_for_customer:
-        #     total_spent = sum(order.order_total for order in orders_for_customer if order.order_total)
-        #     customer.average_order_total = total_spent / len(orders_for_customer)
+       
         orders_for_customer = session.exec(
             select(Order).where(Order.order_customer == customer.customer_name)
         ).all()
@@ -270,57 +264,6 @@ async def update_customer(id: int, payload: Customer, session: Session = Depends
     return {"message:" f"Customer updated: {existing_customer.id}"}
 
 
-# @app.post('/register', response_model=UserSchema)
-# def register_user(payload: UserRegistrationSchema, session: Session = Depends(get_session)):
-#     """Processes request to register user account."""
-#     payload.hashed_password = User.hash_password(payload.hashed_password)
-#     return create_user(user=payload, session=session)
-
-
-# @app.post('/login', status_code=200)
-# async def login(payload: UserAccountSchema, session: Session = Depends(get_session)):
-#     try:
-#         user: User = get_user(email=payload.email, session=session)
-#     except:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Invalid user credentials"
-#         )
-
-#     is_validated: bool = user.validate_password(payload.hashed_password)
-#     print(f"Is user validated? {is_validated}")
-#     if not is_validated:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Invalid user credentials"
-#         )
-
-#     access_token_expires = timedelta(
-#         minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
-#     access_token = create_access_token(
-#         data={"email": user.email}, expires_delta=access_token_expires
-#     )
-#     return Token(access_token=access_token, token_type="bearer")
-
-
-# @app.get('/getUser', status_code=200)
-# async def get_user_id(current_user: User = Depends(get_current_user_token)):
-#     return {"email": current_user.email, "id": current_user.id}
-
-
-# @app.get('/logout', status_code=200)
-# def logout(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)):
-#     try:
-#         blacklisted_token = BlacklistedToken(
-#             created_at=datetime.now(timezone.utc), token=token)
-#         session.add(blacklisted_token)
-#         session.commit()
-#     except IntegrityError as e:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Invalid token"
-#         )
-#     return {"details:": "Logged out"}
-
 if __name__ == "__main__":
     uvicorn.run('main:app', host='localhost', port=8000, reload=True)
+    

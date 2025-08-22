@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
@@ -58,6 +58,13 @@ async def get_all_customers(session: Session = Depends(get_session)):
     print(f"Results: {results}")
     return results
 
+#Below is for searchbar functionality in the frontend on new orders page for custoer
+@app.get("/customers/search")
+def search_customers(q: str = Query(..., min_length=1), session: Session = Depends(get_session)):
+    results = session.exec(
+        select(Customer).where(Customer.customer_name.ilike(f"%{q}%"))
+    ).all()
+    return results
 # READ data
 
 # # CREATE data
@@ -81,6 +88,31 @@ async def add_order(payload:Order, session: Session = Depends(get_session)):
     session.add(new_order)
     session.commit()
     session.refresh(new_order)
+
+        # 2. Find the customer and update their stats
+    statement = select(Customer).where(Customer.customer_name == new_order.order_customer)
+    customer = session.exec(statement).first()
+
+    if customer:
+        # Increment order quantity
+        customer.order_quantity = (customer.order_quantity or 0) + 1
+
+        # Update last order date
+        customer.last_order_date = new_order.order_date
+
+        # Recalculate average order total
+        orders_for_customer = session.exec(
+            select(Order).where(Order.order_customer == customer.customer_name)
+        ).all()
+
+        if orders_for_customer:
+            total_spent = sum(order.order_total for order in orders_for_customer if order.order_total)
+            customer.average_order_total = total_spent / len(orders_for_customer)
+
+        session.add(customer)
+        session.commit()
+        session.refresh(customer)
+
     return {"message:" f"New order created: {new_order.id}"}
 
 @app.post("/customers")
@@ -121,21 +153,9 @@ async def get_customer(id: int, session: Session = Depends(get_session)):
 
     return result
 
+
 @app.put("/orders/{id}")
 async def update_order(id: int, payload: Order, session: Session = Depends(get_session)):
-    updated_order = Order(
-        order_customer=payload.order_customer,
-        order_po=payload.order_po, 
-        order_date=payload.order_date, 
-        order_created_by=payload.order_created_by,
-        order_created_at=payload.order_created_at,
-        requested_date=payload.requested_date, 
-        order_product=payload.order_product, 
-        order_product_quantity=payload.order_product_quantity,  
-        order_status=payload.order_status,
-        order_total=payload.order_total,
-        tracking_number=payload.tracking_number,
-    )
     statement = select(Order).where(Order.id == id)
     existing_order = session.exec(statement).first()
     
@@ -145,22 +165,42 @@ async def update_order(id: int, payload: Order, session: Session = Depends(get_s
             detail=f"Order with id {id} not found"
         )
     
-    existing_order.order_customer = updated_order.order_customer
-    existing_order.order_po = updated_order.order_po
-    existing_order.order_date = updated_order.order_date
-    existing_order.order_created_by = updated_order.order_created_by
-    existing_order.order_created_at = updated_order.order_created_at
-    existing_order.requested_date = updated_order.requested_date
-    existing_order.order_product = updated_order.order_product
-    existing_order.order_product_quantity = updated_order.order_product_quantity
-    existing_order.order_status = updated_order.order_status
-    existing_order.order_total = updated_order.order_total
-    existing_order.tracking_number = updated_order.tracking_number
+    # Update fields (using customer_id now instead of order_customer)
+    existing_order.customer_id = payload.customer_id
+    existing_order.order_po = payload.order_po
+    existing_order.order_date = payload.order_date
+    existing_order.order_created_by = payload.order_created_by
+    existing_order.order_created_at = payload.order_created_at
+    existing_order.requested_date = payload.requested_date
+    existing_order.order_product = payload.order_product
+    existing_order.order_product_quantity = payload.order_product_quantity
+    existing_order.order_status = payload.order_status
+    existing_order.order_total = payload.order_total
+    existing_order.tracking_number = payload.tracking_number
 
     session.add(existing_order)
     session.commit()
     session.refresh(existing_order)
-    return {"message:" f"Order updated: {existing_order.id}"}
+
+    # 🔄 Update customer stats (same as in POST but without increment)
+    customer = session.get(Customer, existing_order.customer_id)
+    if customer:
+        orders_for_customer = session.exec(
+            select(Order).where(Order.customer_id == customer.id)
+        ).all()
+
+        if orders_for_customer:
+            customer.order_quantity = len(orders_for_customer)
+            customer.last_order_date = max(o.order_date for o in orders_for_customer)
+            total_spent = sum(order.order_total for order in orders_for_customer if order.order_total)
+            customer.average_order_total = total_spent / len(orders_for_customer)
+
+        session.add(customer)
+        session.commit()
+        session.refresh(customer)
+
+    return {"message": f"Order updated: {existing_order.id}"}
+
 
 
 @app.put("/customers/{id}")

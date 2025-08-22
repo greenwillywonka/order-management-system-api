@@ -101,14 +101,25 @@ async def add_order(payload:Order, session: Session = Depends(get_session)):
         customer.last_order_date = new_order.order_date
 
         # Recalculate average order total
+        # orders_for_customer = session.exec(
+        #     select(Order).where(Order.order_customer == customer.customer_name)
+        # ).all()
+
+        # if orders_for_customer:
+        #     total_spent = sum(order.order_total for order in orders_for_customer if order.order_total)
+        #     customer.average_order_total = total_spent / len(orders_for_customer)
         orders_for_customer = session.exec(
             select(Order).where(Order.order_customer == customer.customer_name)
         ).all()
 
-        if orders_for_customer:
-            total_spent = sum(order.order_total for order in orders_for_customer if order.order_total)
-            customer.average_order_total = total_spent / len(orders_for_customer)
+        # Filter out orders that don’t have a numeric total
+        totals = [order.order_total for order in orders_for_customer if order.order_total is not None]
 
+        if totals:
+            customer.average_order_total = sum(totals) / len(totals)
+        else:
+            customer.average_order_total = 0
+            
         session.add(customer)
         session.commit()
         session.refresh(customer)

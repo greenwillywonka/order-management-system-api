@@ -164,54 +164,6 @@ async def get_customer(id: int, session: Session = Depends(get_session)):
 
     return result
 
-
-# @app.put("/orders/{id}")
-# async def update_order(id: int, payload: Order, session: Session = Depends(get_session)):
-#     statement = select(Order).where(Order.id == id)
-#     existing_order = session.exec(statement).first()
-    
-#     if not existing_order:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail=f"Order with id {id} not found"
-#         )
-    
-#     # Update fields (using customer_id now instead of order_customer)
-#     existing_order.customer_id = payload.customer_id
-#     existing_order.order_po = payload.order_po
-#     existing_order.order_date = payload.order_date
-#     existing_order.order_created_by = payload.order_created_by
-#     existing_order.order_created_at = payload.order_created_at
-#     existing_order.requested_date = payload.requested_date
-#     existing_order.order_product = payload.order_product
-#     existing_order.order_product_quantity = payload.order_product_quantity
-#     existing_order.order_status = payload.order_status
-#     existing_order.order_total = payload.order_total
-#     existing_order.tracking_number = payload.tracking_number
-
-#     session.add(existing_order)
-#     session.commit()
-#     session.refresh(existing_order)
-
-#     # 🔄 Update customer stats (same as in POST but without increment)
-#     customer = session.get(Customer, existing_order.customer_id)
-#     if customer:
-#         orders_for_customer = session.exec(
-#             select(Order).where(Order.customer_id == customer.id)
-#         ).all()
-
-#         if orders_for_customer:
-#             customer.order_quantity = len(orders_for_customer)
-#             customer.last_order_date = max(o.order_date for o in orders_for_customer)
-#             total_spent = sum(order.order_total for order in orders_for_customer if order.order_total)
-#             customer.average_order_total = total_spent / len(orders_for_customer)
-
-#         session.add(customer)
-#         session.commit()
-#         session.refresh(customer)
-
-#     return {"message": f"Order updated: {existing_order.id}"}
-
 @app.put("/orders/{id}")
 async def update_order(id: int, payload: Order, session: Session = Depends(get_session)):
     # 1️⃣ Find the existing order
